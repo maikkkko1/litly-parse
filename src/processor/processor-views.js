@@ -10,6 +10,8 @@ module.exports = class ProcessorViews {
   processViews = () => {
     this.handleHomeView();
     this.handleCloudFunctionsView();
+    this.handleClassHooksView();
+    this.handleCloudJobsView();
   };
 
   handleHomeView = () => {
@@ -36,6 +38,17 @@ module.exports = class ProcessorViews {
       res.render("cloud_jobs", {
         ...this.getDefaultParams(),
         ...{ data: cloudJobAnnotations },
+      });
+    });
+  };
+
+  handleClassHooksView = () => {
+    const { classHooksAnnotations } = this.processedAnnotations;
+
+    this.express.get("/litly-doc/class-hooks", (_, res) => {
+      res.render("class_hooks", {
+        ...this.getDefaultParams(),
+        ...{ data: classHooksAnnotations },
       });
     });
   };

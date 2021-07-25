@@ -1,12 +1,16 @@
 {
   "name": "litly",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Doc generator for Parse.",
   "main": "litly.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maikkkko1/litly-parse"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Maikon Ferreira",
   "license": "ISC",
   "dependencies": {
     "ejs": "^3.1.5",
