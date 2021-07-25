@@ -7,6 +7,7 @@ module.exports = class ProcessorViews {
     this.processViews();
   };
 
+  /** Init and set views. */
   processViews = () => {
     this.handleHomeView();
     this.handleCloudFunctionsView();
