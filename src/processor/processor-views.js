@@ -21,10 +21,22 @@ module.exports = class ProcessorViews {
   handleCloudFunctionsView = () => {
     const { cloudFunctionAnnotations } = this.processedAnnotations;
 
-    console.log(cloudFunctionAnnotations);
-
     this.express.get("/litly-doc/cloud-functions", (_, res) => {
-      res.render("cloud_functions", { ...this.getDefaultParams(), ...{ data: cloudFunctionAnnotations } });
+      res.render("cloud_functions", {
+        ...this.getDefaultParams(),
+        ...{ data: cloudFunctionAnnotations },
+      });
+    });
+  };
+
+  handleCloudJobsView = () => {
+    const { cloudJobAnnotations } = this.processedAnnotations;
+
+    this.express.get("/litly-doc/cloud-jobs", (_, res) => {
+      res.render("cloud_jobs", {
+        ...this.getDefaultParams(),
+        ...{ data: cloudJobAnnotations },
+      });
     });
   };
 
