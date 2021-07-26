@@ -60,7 +60,7 @@ These are the annotations currently available for use with **Litly**.
  * someCloudFunction
  *
  * @description
- * Returns a list of integers. @use_next_line
+ * @use_next_line Returns a list of integers.
  * Using two lines description with @use_next_line
  *
  * @response
