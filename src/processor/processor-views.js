@@ -17,7 +17,10 @@ module.exports = class ProcessorViews {
 
   handleHomeView = () => {
     this.express.get("/litly-doc", (_, res) => {
-      res.render("index", this.getDefaultParams());
+      res.render("index", {
+        ...this.getDefaultParams(),
+        ...{ processedAnnotations: this.processedAnnotations },
+      });
     });
   };
 
