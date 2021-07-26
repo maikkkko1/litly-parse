@@ -7,7 +7,5 @@ module.exports = {
   LITLY_PARAM: "@param",
   LITLY_PARSE_CLASS: "@parse_class",
   LITLY_RESPONSE: "@response",
-  LITLY_OBJECT: "@object",
-  LITLY_ARRAY_OBJECTS: "@array_of_objects",
-  LITLY_ARRAY_OF: "@array_of"
+  LITLY_RUN_EVERY: "@run_every",
 };

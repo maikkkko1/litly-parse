@@ -12,14 +12,14 @@
         <h5 class="mt-3">Documented Cloud Jobs for <%= appName %>.</h5>
 
         <div class="mt-4">
-          <% data.forEach(function(cf) { %>
+          <% data.forEach(function(cj) { %>
 
           <div class="card mt-3" style="width: auto">
             <div class="card-body">
-              <h5 class="card-title">
-                Job name: <span class="text-primary"><%= cf.name %></span>
-              </h5>
-              <p class="card-text lead"><%= cf.description %></p>
+              <h5 class="card-title">Job name: <span class="text-primary"><%= cj.name %></span></h5>
+              <p class="card-text lead"><%= cj.description %></p>
+
+              <h5 class="mt-3">Run every <%= cj.runEvery %>.</h5>
             </div>
           </div>
 

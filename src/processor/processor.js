@@ -1,11 +1,7 @@
 const glob = require("glob");
 const fs = require("fs");
 const eol = require("eol");
-const {
-  CLOUD_FUNCTION,
-  CLOUD_JOB,
-  CLASS_HOOK,
-} = require("../types/annotation.types");
+const { CLOUD_FUNCTION, CLOUD_JOB } = require("../types/annotation.types");
 const { removeAllOccurrencesFromString } = require("../utils/utils");
 
 const {
@@ -17,6 +13,7 @@ const {
   LITLY_PARAM,
   LITLY_PARSE_CLASS,
   LITLY_RESPONSE,
+  LITLY_RUN_EVERY,
 } = require("../types/tag.types");
 const ProcessorViews = require("./processor-views");
 
@@ -28,38 +25,29 @@ module.exports = class Processor {
   process = (express, appName) => {
     const cloudFunctionAnnotations = [];
     const cloudJobAnnotations = [];
-    const classHooksAnnotations = [];
 
-    glob(
-      "**/*.js",
-      { ignore: ["node_modules/**", "**/types/**"] },
-      async (er, files) => {
-        for (const file of files) {
-          const annotations = await this.getUnprocessedAnnotations(file);
+    glob("**/*.js", { ignore: ["node_modules/**", "**/types/**"] }, async (er, files) => {
+      for (const file of files) {
+        const annotations = await this.getUnprocessedAnnotations(file);
 
-          const processedAnnotations = this.processAnnotations(annotations);
+        const processedAnnotations = this.processAnnotations(annotations);
 
-          for (const annotationData of processedAnnotations) {
-            switch (annotationData.type) {
-              case CLOUD_FUNCTION:
-                cloudFunctionAnnotations.push(annotationData);
-                break;
-              case CLOUD_JOB:
-                cloudJobAnnotations.push(annotationData);
-                break;
-              case CLASS_HOOK:
-                classHooksAnnotations.push(annotationData);
-            }
+        for (const annotationData of processedAnnotations) {
+          switch (annotationData.type) {
+            case CLOUD_FUNCTION:
+              cloudFunctionAnnotations.push(annotationData);
+              break;
+            case CLOUD_JOB:
+              cloudJobAnnotations.push(annotationData);
           }
         }
-
-        new ProcessorViews().process(express, appName, {
-          cloudFunctionAnnotations,
-          cloudJobAnnotations,
-          classHooksAnnotations,
-        });
       }
-    );
+
+      new ProcessorViews().process(express, appName, {
+        cloudFunctionAnnotations,
+        cloudJobAnnotations,
+      });
+    });
   };
 
   getUnprocessedAnnotations = (path) => {
@@ -68,11 +56,7 @@ module.exports = class Processor {
     return new Promise((resolve, reject) => {
       fs.readFile(path, { encoding: "utf-8" }, (err, data) => {
         if (!err) {
-          while (
-            data.includes(LITLY_START) &&
-            data.includes(LITLY_END) &&
-            !data.includes("@Litly Class")
-          ) {
+          while (data.includes(LITLY_START) && data.includes(LITLY_END) && !data.includes("@Litly Class")) {
             const startIndex = data.indexOf(LITLY_START);
             const endIndex = data.indexOf(LITLY_END) + 10;
 
@@ -95,20 +79,26 @@ module.exports = class Processor {
   getAnnotationType = (annotation, file) => {
     if (annotation.includes(CLOUD_FUNCTION)) return CLOUD_FUNCTION;
     if (annotation.includes(CLOUD_JOB)) return CLOUD_JOB;
-    if (annotation.includes(CLASS_HOOK)) return CLASS_HOOK;
 
-    throw Error(
-      `Unsupported Annotation Type at ${file} \nSupported types: ${CLOUD_FUNCTION}, ${CLOUD_JOB} and ${CLASS_HOOK}.`
-    );
+    throw Error(`Unsupported Annotation Type at ${file} \nSupported types: ${CLOUD_FUNCTION} and ${CLOUD_JOB}.`);
   };
 
   getAnnotationName = (annotation, file) => {
-    const nameTagIndex = annotation.indexOf("@name");
+    const nameTagIndex = annotation.indexOf(LITLY_NAME);
 
-    if (nameTagIndex == -1)
-      throw Error(`Please provide a @name for your annotation at ${file}.`);
+    if (nameTagIndex == -1) throw Error(`Please provide a ${LITLY_NAME} for your annotation at ${file}.`);
 
     return this.findTagValue(annotation, LITLY_NAME);
+  };
+
+  getAnnotationRunEvery = (annotation, file, type) => {
+    const nameTagIndex = annotation.indexOf(LITLY_RUN_EVERY);
+
+    if (type == CLOUD_JOB) {
+      if (nameTagIndex == -1) throw Error(`Please provide a ${LITLY_RUN_EVERY} for your annotation at ${file}.`);
+    }
+
+    return this.findTagValue(annotation, LITLY_RUN_EVERY);
   };
 
   getAnnotationDescription = (annotation) => {
@@ -119,14 +109,9 @@ module.exports = class Processor {
       line = line.replace("*", "").trim();
 
       const isToContinueNextLine = line.includes(LITLY_USE_NEXT_LINE);
-      const isToContinueNextLinePrevious =
-        previousLine.includes(LITLY_USE_NEXT_LINE);
+      const isToContinueNextLinePrevious = previousLine.includes(LITLY_USE_NEXT_LINE);
 
-      if (
-        previousLine.includes(LITLY_DESCRIPTION) ||
-        isToContinueNextLine ||
-        isToContinueNextLinePrevious
-      ) {
+      if (previousLine.includes(LITLY_DESCRIPTION) || isToContinueNextLine || isToContinueNextLinePrevious) {
         value += line;
       }
 
@@ -166,16 +151,14 @@ module.exports = class Processor {
     return params;
   };
 
-  getAnnotationResponse = (annotation, file) => {
+  getAnnotationResponse = (annotation, file, type) => {
     let previousLine = "";
     let ignorePreviousLine = false;
 
     let response = "";
 
-    if (!annotation.includes(LITLY_RESPONSE)) {
-      throw Error(
-        `Please provide a @response for you annotation at file ${file}.`
-      );
+    if (!annotation.includes(LITLY_RESPONSE) && type == CLOUD_FUNCTION) {
+      throw Error(`Please provide a ${LITLY_RESPONSE} for you annotation at file ${file}.`);
     }
 
     for (let line of eol.split(annotation)) {
@@ -214,7 +197,8 @@ module.exports = class Processor {
       annotationData.name = this.getAnnotationName(annotation, file);
       annotationData.description = this.getAnnotationDescription(annotation);
       annotationData.params = this.getAnnotationParams(annotation, file);
-      annotationData.response = this.getAnnotationResponse(annotation, file);
+      annotationData.runEvery = this.getAnnotationRunEvery(annotation, file, annotationData.type);
+      annotationData.response = this.getAnnotationResponse(annotation, file, annotationData.type);
 
       processedAnnotations.push(annotationData);
     }

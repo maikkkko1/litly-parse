@@ -1,8 +1,8 @@
 {
   "name": "litly",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Doc generator for Parse.",
-  "main": "litly.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/maikkkko1/litly-parse"
@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "ejs": "^3.1.5",
+    "eol": "^0.9.1",
     "glob": "^7.1.7"
   }
 }
