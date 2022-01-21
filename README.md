@@ -40,6 +40,7 @@ These are the annotations currently available for use with **Litly**.
 | @litly_start | Sets the start of a Litly document |
 | @litly_end | Sets the end of a Litly document |
 | @name | Sets the name of the document |
+| @group | Sets the group of the document |
 | @description| Sets the description of the document |
 | @param| Sets the param of the document |
 | @response| Sets the response of the document |
@@ -99,6 +100,68 @@ Parse.Cloud.define("someCloudFunction", async () => {
  * @litly_end
  */
 Parse.Cloud.define("someCloudFunction", async () => {
+  return { user };
+});
+```
+
+#### Documenting Cloud Functions with grouping
+
+```js
+/**
+ * @litly_start
+ * @cloud_function
+ *
+ * @group
+ * MyGroup
+ *
+ * @name
+ * someCloudFunction
+ *
+ * @description
+ * Returns a list of integers.
+ *
+ * @param
+ * userId: string - User ID from the current User.
+ * @param
+ * Cat: @parse_class Cat
+ *
+ * @response
+ * {
+ *   "user": "user"
+ * }
+ *
+ * @litly_end
+ */
+Parse.Cloud.define("someCloudFunction1", async () => {
+  return { user };
+});
+
+/**
+ * @litly_start
+ * @cloud_function
+ *
+ * @group
+ * MyGroup
+ *
+ * @name
+ * someCloudFunction
+ *
+ * @description
+ * Returns a list of integers.
+ *
+ * @param
+ * userId: string - User ID from the current User.
+ * @param
+ * Cat: @parse_class Cat
+ *
+ * @response
+ * {
+ *   "user": "user"
+ * }
+ *
+ * @litly_end
+ */
+Parse.Cloud.define("someCloudFunction2", async () => {
   return { user };
 });
 ```

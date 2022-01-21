@@ -26,10 +26,21 @@ module.exports = class ProcessorViews {
   handleCloudFunctionsView = () => {
     const { cloudFunctionAnnotations } = this.processedAnnotations;
 
+    const groupedData = cloudFunctionAnnotations.reduce(
+      (groups, item) => ({
+        ...groups,
+        [item.group]: [...(groups[item.group] || []), item],
+      }),
+      {}
+    );
+
     this.express.get("/litly-doc/cloud-functions", (_, res) => {
       res.render("cloud_functions", {
         ...this.getDefaultParams(),
-        ...{ data: cloudFunctionAnnotations },
+        ...{
+          data: groupedData,
+          groupedKeys: Object.keys(groupedData),
+        },
       });
     });
   };

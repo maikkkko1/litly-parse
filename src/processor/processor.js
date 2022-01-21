@@ -91,6 +91,14 @@ module.exports = class Processor {
     return this.findTagValue(annotation, LITLY_NAME);
   };
 
+  getAnnotationGroup = (annotation) => {
+    const groupTagIndex = annotation.indexOf(LITLY_GROUP);
+
+    if (groupTagIndex == -1) return "Common";
+
+    return this.findTagValue(annotation, LITLY_GROUP);
+  };
+
   getAnnotationRunEvery = (annotation, file, type) => {
     const nameTagIndex = annotation.indexOf(LITLY_RUN_EVERY);
 
@@ -195,6 +203,7 @@ module.exports = class Processor {
 
       annotationData.type = this.getAnnotationType(annotation, file);
       annotationData.name = this.getAnnotationName(annotation, file);
+      annotationData.group = this.getAnnotationGroup(annotation);
       annotationData.description = this.getAnnotationDescription(annotation);
       annotationData.params = this.getAnnotationParams(annotation, file);
       annotationData.runEvery = this.getAnnotationRunEvery(annotation, file, annotationData.type);
