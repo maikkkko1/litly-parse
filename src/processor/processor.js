@@ -14,6 +14,7 @@ const {
   LITLY_PARSE_CLASS,
   LITLY_RESPONSE,
   LITLY_RUN_EVERY,
+  LITLY_GROUP,
 } = require("../types/tag.types");
 const ProcessorViews = require("./processor-views");
 

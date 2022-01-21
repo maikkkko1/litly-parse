@@ -104,7 +104,7 @@ Parse.Cloud.define("someCloudFunction", async () => {
 });
 ```
 
-#### Documenting Cloud Functions with grouping
+#### Documenting Cloud Functions with grouping (1.1.7 >=)
 
 ```js
 /**
